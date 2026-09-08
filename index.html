@@ -83,7 +83,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 ══════════════════════════════════════════ */
 .gm-row{
   display:flex;gap:20px;justify-content:center;flex-wrap:wrap;
-  max-width:960px;margin:0 auto 8px;
+  max-width:960px;margin:0 auto 0;
 }
 
 .gm-card{
@@ -163,23 +163,26 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
    EXPANDED GM AREA
 ══════════════════════════════════════════ */
 .gm-expanded{
+  position:relative;
   max-width:960px;margin:0 auto 24px;
-  overflow:hidden;
-  max-height:0;
-  opacity:0;
-  transform:translateY(-12px);
-  transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s ease,transform .35s ease;
 }
-.gm-expanded.open{
-  max-height:6000px;
-  opacity:1;
-  transform:translateY(0);
-}
+.connector-svg{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;overflow:visible;z-index:2}
+.conn{fill:none;stroke-linecap:round;stroke-width:2;transition:stroke-dashoffset .5s ease}
+.conn-dot{transition:opacity .25s ease}
+.gm-conn .conn{stroke:#93c5fd}
+.gm-conn .conn-dot{fill:#93c5fd}
+.om-conn .conn{stroke:#6ee7b7}
+.om-conn .conn-dot{fill:#6ee7b7}
 
 /* ══════════════════════════════════════════
    RM CARDS
 ══════════════════════════════════════════ */
-.rm-row{display:flex;gap:14px;flex-wrap:wrap;padding:16px 0 4px}
+.rm-row{
+  display:flex;gap:14px;flex-wrap:wrap;padding:0;position:relative;z-index:1;
+  overflow:hidden;max-height:0;opacity:0;transform:translateY(-12px);
+  transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s ease,transform .35s ease,padding-top .45s cubic-bezier(.4,0,.2,1);
+}
+.gm-expanded.open .rm-row{max-height:6000px;opacity:1;transform:translateY(0);padding-top:40px}
 
 .rm-card{
   background:#fff;
@@ -238,14 +241,16 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
    OM AREA + CARDS
 ══════════════════════════════════════════ */
 .om-area{
-  overflow:hidden;
-  max-height:0;opacity:0;transform:translateY(-8px);
-  transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .28s ease,transform .3s ease;
-  margin-left:20px;border-left:3px solid #bfdbfe;padding-left:16px;margin-top:2px;
+  position:relative;
+  margin-left:20px;border-left:3px solid #bfdbfe;padding-left:16px;margin-top:0;
 }
-.om-area.open{max-height:4000px;opacity:1;transform:translateY(0)}
 
-.om-row{display:flex;gap:11px;flex-wrap:wrap;padding:14px 0 4px}
+.om-row{
+  display:flex;gap:11px;flex-wrap:wrap;padding:0;position:relative;z-index:1;
+  overflow:hidden;max-height:0;opacity:0;transform:translateY(-8px);
+  transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .28s ease,transform .3s ease,padding .4s cubic-bezier(.4,0,.2,1);
+}
+.om-area.open .om-row{max-height:4000px;opacity:1;transform:translateY(0);padding:36px 0 4px}
 
 .om-card{
   background:#fff;
@@ -303,10 +308,10 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 .sf-area{
   overflow:hidden;
   max-height:0;opacity:0;transform:translateY(-6px);
-  transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .25s ease,transform .28s ease;
-  margin-left:16px;border-left:3px solid #a7f3d0;padding-left:14px;margin-top:2px;
+  transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .25s ease,transform .28s ease,margin-top .38s ease;
+  margin-left:16px;border-left:3px solid #a7f3d0;padding-left:14px;margin-top:0;
 }
-.sf-area.open{max-height:3000px;opacity:1;transform:translateY(0)}
+.sf-area.open{max-height:3000px;opacity:1;transform:translateY(0);margin-top:2px}
 
 .sf-grid{display:flex;flex-wrap:wrap;gap:7px;padding:12px 0 8px}
 .sf-chip{
@@ -415,6 +420,9 @@ function build(){
     // Expanded area
     const exp=document.createElement('div');
     exp.className='gm-expanded';exp.id='gm-e'+gi;
+    const gmSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+    gmSvg.setAttribute('class','connector-svg gm-conn');gmSvg.id='gm-svg'+gi;
+    exp.appendChild(gmSvg);
 
     const rmRow=document.createElement('div');
     rmRow.className='rm-row';
@@ -448,6 +456,9 @@ function build(){
     gm.rms.forEach((rm,ri)=>{
       const omArea=document.createElement('div');
       omArea.className='om-area';omArea.id=`om-a${gi}-${ri}`;
+      const omSvg=document.createElementNS('http://www.w3.org/2000/svg','svg');
+      omSvg.setAttribute('class','connector-svg om-conn');omSvg.id=`om-svg${gi}-${ri}`;
+      omArea.appendChild(omSvg);
 
       const omRow=document.createElement('div');
       omRow.className='om-row';
@@ -502,6 +513,83 @@ function build(){
   app.insertBefore(gmRow,app.firstChild);
 }
 
+/* ── Connector lines (parent → children, org-chart style) ── */
+function drawConnectors(svg,parentCard,childEls){
+  if(!svg||!parentCard||!childEls.length)return;
+  svg.innerHTML='';
+  const cRect=svg.parentElement.getBoundingClientRect();
+  const pRect=parentCard.getBoundingClientRect();
+  const originX=pRect.left+pRect.width/2-cRect.left;
+  const originY=pRect.bottom-cRect.top;
+
+  // Group children into visual rows (they may wrap on narrow screens)
+  const rows=[];
+  childEls.forEach(el=>{
+    const r=el.getBoundingClientRect();
+    const top=Math.round(r.top-cRect.top);
+    const cx=r.left+r.width/2-cRect.left;
+    let row=rows.find(row=>Math.abs(row.top-top)<6);
+    if(!row){row={top,items:[]};rows.push(row);}
+    row.items.push(cx);
+  });
+  rows.sort((a,b)=>a.top-b.top);
+
+  const segs=[];
+  let fromX=originX,fromY=originY;
+  rows.forEach((row,ri)=>{
+    const barY=row.top-10;
+    const minX=Math.min(...row.items),maxX=Math.max(...row.items);
+    segs.push({d:`M${fromX},${fromY} L${fromX},${barY}`,delay:ri*130});
+    if(row.items.length>1)segs.push({d:`M${minX},${barY} L${maxX},${barY}`,delay:ri*130+130});
+    row.items.forEach(cx=>segs.push({d:`M${cx},${barY} L${cx},${row.top}`,delay:ri*130+230}));
+    fromX=(minX+maxX)/2;fromY=row.top;
+  });
+
+  segs.forEach(s=>{
+    const path=document.createElementNS('http://www.w3.org/2000/svg','path');
+    path.setAttribute('d',s.d);path.setAttribute('class','conn');
+    svg.appendChild(path);
+    const len=path.getTotalLength();
+    path.style.strokeDasharray=len;path.style.strokeDashoffset=len;
+    path.style.transitionDelay=s.delay+'ms';
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{path.style.strokeDashoffset=0;}));
+  });
+
+  // Anchor dots at the origin and at every child landing point — keeps the join
+  // visually unambiguous even where a card's own glow/shadow blends with the line.
+  const dots=[{x:originX,y:originY,delay:0}];
+  rows.forEach((row,ri)=>{row.items.forEach(cx=>dots.push({x:cx,y:row.top,delay:ri*130+280}));});
+  dots.forEach(dot=>{
+    const circle=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    circle.setAttribute('cx',dot.x);circle.setAttribute('cy',dot.y);circle.setAttribute('r',4);
+    circle.setAttribute('class','conn-dot');
+    circle.style.opacity='0';circle.style.transitionDelay=dot.delay+'ms';
+    svg.appendChild(circle);
+    requestAnimationFrame(()=>requestAnimationFrame(()=>{circle.style.opacity='1';}));
+  });
+}
+
+const OPEN_CONNECTORS=[]; // {svg,parentCard,childEls} — redrawn on resize
+function registerAndDraw(svg,parentCard,childEls){
+  const idx=OPEN_CONNECTORS.findIndex(o=>o.svg===svg);
+  const entry={svg,parentCard,childEls};
+  if(idx>-1)OPEN_CONNECTORS[idx]=entry;else OPEN_CONNECTORS.push(entry);
+  drawConnectors(svg,parentCard,childEls);
+}
+function scheduleDraw(svg,parentCard,childEls){
+  // Cards lift/scale on activation (.35s transform transition) — draw once immediately
+  // for instant feedback, then redraw once the lift settles so the line lands exactly
+  // on the card's final position instead of its pre-animation spot.
+  registerAndDraw(svg,parentCard,childEls);
+  setTimeout(()=>drawConnectors(svg,parentCard,childEls),380);
+}
+function unregisterConnector(svg){
+  const idx=OPEN_CONNECTORS.findIndex(o=>o.svg===svg);
+  if(idx>-1)OPEN_CONNECTORS.splice(idx,1);
+  if(svg)svg.innerHTML='';
+}
+window.addEventListener('resize',()=>{OPEN_CONNECTORS.forEach(o=>drawConnectors(o.svg,o.parentCard,o.childEls));});
+
 /* ── Toggles ── */
 function toggleGM(gi){
   const exp=document.getElementById('gm-e'+gi);
@@ -512,7 +600,12 @@ function toggleGM(gi){
   // Also close RMs/OMs underneath
   document.querySelectorAll('.om-area,.sf-area').forEach(e=>e.classList.remove('open'));
   document.querySelectorAll('.rm-card,.om-card').forEach(c=>c.classList.remove('active'));
-  if(!isOpen){exp.classList.add('open');card.classList.add('active');}
+  document.querySelectorAll('.connector-svg').forEach(unregisterConnector);
+  if(!isOpen){
+    exp.classList.add('open');card.classList.add('active');
+    const rmCards=[...exp.querySelectorAll('.rm-card')];
+    requestAnimationFrame(()=>scheduleDraw(exp.querySelector('svg.gm-conn'),card,rmCards));
+  }
 }
 
 function toggleRM(gi,ri){
@@ -524,7 +617,7 @@ function toggleRM(gi,ri){
   DATA[gi].rms.forEach((_,i)=>{
     const a=document.getElementById(`om-a${gi}-${i}`);
     const c=document.getElementById(`rm-c${gi}-${i}`);
-    if(a)a.classList.remove('open');
+    if(a){a.classList.remove('open');unregisterConnector(a.querySelector('svg.om-conn'));}
     if(c)c.classList.remove('active');
     DATA[gi].rms[i].oms.forEach((_2,j)=>{
       const sa=document.getElementById(`sf-a${gi}-${i}-${j}`);
@@ -533,7 +626,11 @@ function toggleRM(gi,ri){
       if(oc)oc.classList.remove('active');
     });
   });
-  if(!isOpen){area.classList.add('open');card.classList.add('active');}
+  if(!isOpen){
+    area.classList.add('open');card.classList.add('active');
+    const omCards=[...area.querySelectorAll('.om-card')];
+    requestAnimationFrame(()=>scheduleDraw(area.querySelector('svg.om-conn'),card,omCards));
+  }
 }
 
 function toggleOM(gi,ri,oi){
