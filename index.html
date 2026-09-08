@@ -179,7 +179,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 ══════════════════════════════════════════ */
 .rm-row{
   display:flex;gap:14px;flex-wrap:wrap;padding:0;position:relative;z-index:1;
-  overflow:hidden;max-height:0;opacity:0;transform:translateY(-12px);
+  overflow-x:visible;overflow-y:hidden;max-height:0;opacity:0;transform:translateY(-12px);
   transition:max-height .45s cubic-bezier(.4,0,.2,1),opacity .3s ease,transform .35s ease,padding-top .45s cubic-bezier(.4,0,.2,1);
 }
 .gm-expanded.open .rm-row{max-height:6000px;opacity:1;transform:translateY(0);padding-top:40px}
@@ -247,7 +247,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 
 .om-row{
   display:flex;gap:11px;flex-wrap:wrap;padding:0;position:relative;z-index:1;
-  overflow:hidden;max-height:0;opacity:0;transform:translateY(-8px);
+  overflow-x:visible;overflow-y:hidden;max-height:0;opacity:0;transform:translateY(-8px);
   transition:max-height .4s cubic-bezier(.4,0,.2,1),opacity .28s ease,transform .3s ease,padding .4s cubic-bezier(.4,0,.2,1);
 }
 .om-area.open .om-row{max-height:4000px;opacity:1;transform:translateY(0);padding:36px 0 4px}
@@ -306,7 +306,7 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
    SF AREA
 ══════════════════════════════════════════ */
 .sf-area{
-  overflow:hidden;
+  overflow-x:visible;overflow-y:hidden;
   max-height:0;opacity:0;transform:translateY(-6px);
   transition:max-height .38s cubic-bezier(.4,0,.2,1),opacity .25s ease,transform .28s ease,margin-top .38s ease;
   margin-left:16px;border-left:3px solid #a7f3d0;padding-left:14px;margin-top:0;
@@ -331,6 +331,11 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 
 /* header-match glow */
 .header-match{outline:3px solid #fbbf24 !important;outline-offset:2px}
+
+/* Connector lines are a desktop/dashboard affordance only — never render on touch devices */
+@media (pointer:coarse){
+  .connector-svg{display:none !important}
+}
 </style>
 </head>
 <body>
@@ -604,7 +609,7 @@ function toggleGM(gi){
   if(!isOpen){
     exp.classList.add('open');card.classList.add('active');
     const rmCards=[...exp.querySelectorAll('.rm-card')];
-    requestAnimationFrame(()=>scheduleDraw(exp.querySelector('svg.gm-conn'),card,rmCards));
+    if(!isMobileDevice())requestAnimationFrame(()=>scheduleDraw(exp.querySelector('svg.gm-conn'),card,rmCards));
   }
 }
 
@@ -629,7 +634,7 @@ function toggleRM(gi,ri){
   if(!isOpen){
     area.classList.add('open');card.classList.add('active');
     const omCards=[...area.querySelectorAll('.om-card')];
-    requestAnimationFrame(()=>scheduleDraw(area.querySelector('svg.om-conn'),card,omCards));
+    if(!isMobileDevice())requestAnimationFrame(()=>scheduleDraw(area.querySelector('svg.om-conn'),card,omCards));
   }
 }
 
