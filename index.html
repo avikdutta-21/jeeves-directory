@@ -36,6 +36,38 @@
   --shadow-sm:0 2px 8px rgba(0,0,0,.07);
   --shadow-md:0 8px 24px rgba(0,0,0,.12);
   --shadow-lift:0 16px 40px rgba(0,0,0,.18);
+
+  /* toggle button */
+  --toggle-bg:#e2e8f0;
+  --toggle-fg:#475569;
+}
+
+[data-theme="dark"]{
+  --bg:#1a2332;
+  --card:#161b22;
+  --border:#1c2333;
+  --text-dark:#e6edf3;
+  --text-mid:#8b949e;
+  --text-light:#6e7681;
+
+  --gm-idle:#0d1f3c;
+  --gm-active:#1f6feb;
+  --gm-glow:rgba(31,111,235,.4);
+
+  --rm-idle:#161b22;
+  --rm-active:#1f6feb;
+  --rm-glow:rgba(31,111,235,.3);
+
+  --om-idle:#161b22;
+  --om-active:#3fb950;
+  --om-glow:rgba(63,185,80,.3);
+
+  --shadow-sm:0 2px 8px rgba(0,0,0,.4);
+  --shadow-md:0 8px 24px rgba(0,0,0,.6);
+  --shadow-lift:0 16px 40px rgba(0,0,0,.75);
+
+  --toggle-bg:#21262d;
+  --toggle-fg:#8b949e;
 }
 
 *{box-sizing:border-box;margin:0;padding:0}
@@ -358,6 +390,79 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 .footer-content p{margin:0;line-height:1.5}
 .footer-content strong{color:var(--text-mid);font-weight:600}
 
+/* ── Dark-mode component overrides ── */
+[data-theme="dark"] .search-wrap input{background:#2d3748;color:var(--text-dark);border-color:#4a5568}
+[data-theme="dark"] .search-wrap input::placeholder{color:#8b949e}
+[data-theme="dark"] .footer-content{color:#8b949e}
+[data-theme="dark"] .footer-content strong{color:#adbac7}
+[data-theme="dark"] #result-count{color:#8b949e}
+[data-theme="dark"] .search-wrap input:focus{background:#161b22;border-color:#1f6feb;box-shadow:0 0 0 4px rgba(31,111,235,.2),0 4px 12px rgba(31,111,235,.15)}
+[data-theme="dark"] .rm-card{background:linear-gradient(135deg,#0d1f3c 0%,#0d2340 100%);border-color:#1c2f5e}
+[data-theme="dark"] .rm-card:hover{border-color:#1f6feb;box-shadow:0 6px 20px rgba(31,111,235,.2)}
+[data-theme="dark"] .om-card{background:linear-gradient(135deg,#0d1f3c 0%,#0d2340 100%);border-color:#1c2f5e}
+[data-theme="dark"] .om-card:hover{border-color:#3fb950;box-shadow:0 6px 20px rgba(63,185,80,.15)}
+[data-theme="dark"] .rm-avatar{background:#0d1f3c;color:#58a6ff}
+[data-theme="dark"] .om-avatar{background:#0d2119;color:#3fb950}
+[data-theme="dark"] .rm-spill{background:#0d1f3c;color:#58a6ff}
+[data-theme="dark"] .rm-card .rm-phone,
+[data-theme="dark"] .rm-card .rm-phone a,
+[data-theme="dark"] .rm-card .rm-phone span{color:#e6edf3}
+[data-theme="dark"] .om-card .om-phone,
+[data-theme="dark"] .om-card .om-phone a,
+[data-theme="dark"] .om-card .om-phone span{color:#e6edf3}
+[data-theme="dark"] .rm-chevron{background:#21262d;color:#8b949e}
+[data-theme="dark"] .om-chevron{background:#21262d;color:#8b949e}
+[data-theme="dark"] .sf-chip{background:#0d1f3c;border-color:#1c2f5e;color:#8b949e}
+[data-theme="dark"] .sf-chip:hover{background:#0d1f3c;border-color:#1f6feb}
+[data-theme="dark"] .sf-chip.highlight{background:#3a1c00;border-color:#d29922;color:#f0c040}
+[data-theme="dark"] .sr-item{background:#161b22;border-color:#1c2333}
+[data-theme="dark"] .sr-item.exact{background:#0d1f3c;border-color:#1f6feb}
+[data-theme="dark"] .sr-badge.rm{background:#0d1f3c;color:#58a6ff}
+[data-theme="dark"] .sr-badge.om{background:#0d2119;color:#3fb950}
+[data-theme="dark"] .sr-badge.sf{background:#21262d;color:#8b949e}
+[data-theme="dark"] .footer{background:linear-gradient(180deg,transparent 0%,rgba(31,111,235,.04) 100%)}
+
+/* ── Theme toggle button ── */
+.theme-toggle{
+  position:fixed;top:16px;right:16px;z-index:9999;
+  display:flex;align-items:center;gap:8px;
+  background:var(--toggle-bg);color:var(--toggle-fg);
+  border:1.5px solid var(--border);border-radius:28px;
+  padding:6px 12px 6px 8px;
+  font-size:12px;font-weight:600;font-family:'Inter',sans-serif;
+  cursor:pointer;user-select:none;
+  box-shadow:0 2px 8px rgba(0,0,0,.12);
+  transition:background .25s,color .25s,border-color .25s,box-shadow .25s;
+}
+.theme-toggle:hover{box-shadow:0 4px 16px rgba(0,0,0,.2)}
+.tt-icon{font-size:14px;line-height:1}
+
+/* pill switch */
+.tt-switch{position:relative;width:36px;height:20px;flex-shrink:0}
+.tt-switch input{opacity:0;width:0;height:0;position:absolute}
+.tt-track{
+  position:absolute;inset:0;border-radius:20px;
+  background:#cbd5e1;
+  transition:background .3s;
+}
+.tt-thumb{
+  position:absolute;top:3px;left:3px;
+  width:14px;height:14px;border-radius:50%;
+  background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.25);
+  transition:transform .3s cubic-bezier(.34,1.56,.64,1);
+}
+[data-theme="dark"] .tt-track{background:#1f6feb}
+[data-theme="dark"] .tt-thumb{transform:translateX(16px)}
+[data-theme="dark"] .gm-card{background:linear-gradient(135deg,#0d1f3c 0%,#0d2340 100%);border-color:#1c2f5e}
+[data-theme="dark"] .gm-card.active{background:linear-gradient(135deg,#0d1f3c 0%,#1f6feb 100%)}
+@media(max-width:600px){
+  .theme-toggle{top:10px;right:10px;padding:5px 10px 5px 7px;font-size:11px}
+  .tt-switch{width:30px;height:17px}
+  .tt-thumb{width:11px;height:11px}
+  [data-theme="dark"] .tt-thumb{transform:translateX(13px)}
+}
+
 /* Connector lines are a desktop/dashboard affordance only — never render on touch devices */
 @media (pointer:coarse){
   .connector-svg{display:none !important}
@@ -409,6 +514,14 @@ body{font-family:'Inter',sans-serif;background:var(--bg);min-height:100vh;paddin
 </style>
 </head>
 <body>
+
+<div class="theme-toggle" onclick="toggleTheme()" role="button" aria-label="Toggle dark/light mode">
+  <span class="tt-icon" id="themeIcon">☀️</span>
+  <div class="tt-switch" onclick="event.stopPropagation();toggleTheme()">
+    <span class="tt-track"></span>
+    <span class="tt-thumb"></span>
+  </div>
+</div>
 
 <div class="page-header">
   <h1>🏢 Jeeves Directory</h1>
@@ -888,6 +1001,23 @@ function clearHL(){
   document.querySelectorAll('.header-match').forEach(h=>h.classList.remove('header-match'));
 }
 function clearSearch(){document.getElementById('search').value='';doSearch('');}
+
+/* ── Dark / Light mode ── */
+function applyTheme(dark){
+  document.documentElement.setAttribute('data-theme',dark?'dark':'light');
+  document.getElementById('themeIcon').textContent=dark?'🌙':'☀️';
+  try{localStorage.setItem('jd-theme',dark?'dark':'light');}catch(e){}
+}
+function toggleTheme(){
+  const isDark=document.documentElement.getAttribute('data-theme')==='dark';
+  applyTheme(!isDark);
+}
+(function(){
+  let saved;
+  try{saved=localStorage.getItem('jd-theme');}catch(e){}
+  const prefersDark=saved?saved==='dark':window.matchMedia('(prefers-color-scheme:dark)').matches;
+  applyTheme(prefersDark);
+})();
 
 const CURRENT_STATUS='ACTIVE';
 
